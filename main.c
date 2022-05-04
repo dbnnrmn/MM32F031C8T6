@@ -1,32 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include "MM32F031xxn.h"
-#include "types.h"
+#include "FreeRTOS.h"
 #include "hal_gpio.h"
 #include "hal_rcc.h"
-#include "reg_rcc.h"
-
-//PB6
-
-
-int main()
-{
-	RCC_AHBPeriphClockCmd(RCC_AHBENR_GPIOB, ENABLE);
-
-
-	GPIO_InitTypeDef mypin={GPIO_Pin_6,GPIO_Speed_20MHz,GPIO_Mode_Out_PP};
-
-	GPIO_Init(GPIOB, &mypin);
-	//GPIO_WriteBit(GPIOB, GPIO_Pin_6, Bit_SET );
+#include "task.h"
+#include "types.h"
 
 
 
+void my_func() {
+  static uint8_t a = 0;
+  while (1) { a++; }
+}
 
+int main() {
+  TaskHandle_t xHandle = NULL;
+  xTaskCreate(my_func, "task", 300, (void*)1, tskIDLE_PRIORITY, &xHandle);
 
-  while (1)
-    {
+  RCC_AHBPeriphClockCmd(RCC_AHBENR_GPIOB, ENABLE);
 
-    }
+  GPIO_InitTypeDef mypin = {.GPIO_Pin = GPIO_Pin_6,
+                            .GPIO_Speed = GPIO_Speed_20MHz,
+                            .GPIO_Mode = GPIO_Mode_Out_PP};
+
+  GPIO_Init(GPIOB, &mypin);
+
+  vTaskStartScheduler();
 
 }
